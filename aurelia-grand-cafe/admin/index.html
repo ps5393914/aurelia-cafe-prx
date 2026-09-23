@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurelia Grand Café | Admin Dashboard</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --color-gold: #d4af37;
+      --color-black: #0a0a0a;
+      --color-black-light: #1a1a1a;
+      --color-white: #ffffff;
+      --color-text-light: #cccccc;
+      --font-body: 'Inter', sans-serif;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-body);
+      background-color: var(--color-black);
+      color: var(--color-white);
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    .sidebar {
+      width: 250px;
+      background: var(--color-black-light);
+      padding: 2rem;
+      border-right: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    
+    .sidebar h2 { color: var(--color-gold); margin-bottom: 2rem; letter-spacing: 1px; }
+    
+    .nav-item {
+      display: block;
+      padding: 1rem;
+      color: var(--color-text-light);
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    
+    .nav-item:hover, .nav-item.active {
+      background: rgba(212, 175, 55, 0.1);
+      color: var(--color-gold);
+    }
+    
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .card {
+      background: var(--color-black-light);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 2rem;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    th { color: var(--color-gold); }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      background: var(--color-gold);
+      color: var(--color-black);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    .btn-small { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    
+    select.form-control, input.form-control, textarea.form-control {
+      width: 100%;
+      padding: 0.5rem;
+      background: #333;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+
+    #loginOverlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--color-black);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loginOverlay">
+    <div class="card" style="width: 400px; text-align: center;">
+      <h2 style="color: var(--color-gold); margin-bottom: 1.5rem;">Admin Login</h2>
+      <input type="email" id="adminEmail" class="form-control" placeholder="Admin Email">
+      <input type="password" id="adminPassword" class="form-control" placeholder="Password">
+      <button class="btn" style="width: 100%;" onclick="adminLogin()">Login</button>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <h2>AURELIA<br><span style="font-size: 0.9rem; color: white;">Admin Dashboard</span></h2>
+    <a href="#" class="nav-item active" onclick="showSection('dashboard')"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+    <a href="#" class="nav-item" onclick="showSection('orders')"><i class="fa-solid fa-receipt"></i> Orders</a>
+    <a href="#" class="nav-item" onclick="showSection('menu')"><i class="fa-solid fa-utensils"></i> Menu Management</a>
+    <a href="#" class="nav-item" onclick="showSection('reservations')"><i class="fa-solid fa-calendar-check"></i> Reservations</a>
+    <a href="#" class="nav-item" style="color: #ff4757;" onclick="adminLogout()"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h1 id="sectionTitle">Dashboard</h1>
+      <div id="adminName">Welcome, Admin</div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="section">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div class="card" style="text-align: center; border-color: var(--color-gold);">
+          <h3 style="color: var(--color-gold);">Total Orders</h3>
+          <h1 id="statOrders">0</h1>
+        </div>
+        <div class="card" style="text-align: center; border-color: var(--color-gold);">
+          <h3 style="color: var(--color-gold);">Total Revenue</h3>
+          <h1 id="statRevenue">₹0</h1>
+        </div>
+        <div class="card" style="text-align: center; border-color: var(--color-gold);">
+          <h3 style="color: var(--color-gold);">Reservations</h3>
+          <h1 id="statReservations">0</h1>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div id="ordersSection" class="section" style="display: none;">
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Total (₹)</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Menu Section -->
+    <div id="menuSection" class="section" style="display: none;">
+      <button class="btn" style="margin-bottom: 1rem;" onclick="document.getElementById('addMenuForm').style.display = 'block'">+ Add New Item</button>
+      
+      <div id="addMenuForm" class="card" style="display: none;">
+        <h3>Add Menu Item</h3>
+        <input type="text" id="mName" class="form-control" placeholder="Name">
+        <textarea id="mDesc" class="form-control" placeholder="Description"></textarea>
+        <input type="number" id="mPrice" class="form-control" placeholder="Price">
+        <select id="mCat" class="form-control">
+          <option value="Coffee">Coffee</option>
+          <option value="Desserts">Desserts</option>
+          <option value="Burgers">Burgers</option>
+        </select>
+        <input type="text" id="mImg" class="form-control" placeholder="Image URL">
+        <label><input type="checkbox" id="mVeg" checked> Veg</label>
+        <br><br>
+        <button class="btn" onclick="addMenuItem()">Save Item</button>
+        <button class="btn" style="background: #555; color: white;" onclick="document.getElementById('addMenuForm').style.display = 'none'">Cancel</button>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="menuTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Reservations Section -->
+    <div id="reservationsSection" class="section" style="display: none;">
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Date & Time</th>
+              <th>Guests</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="reservationsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
